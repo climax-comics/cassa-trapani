@@ -545,9 +545,11 @@ header .subtitle { font-size: .85rem; opacity: .8; margin-top: 2px; }
   </div>
   <div class="header-actions">
     <span class="save-indicator" id="saveIndicator">Salvato</span>
+    <span class="save-indicator" id="online-badge" style="display:none;background:rgba(46,125,50,.5)">Solo Lettura</span>
     <button class="btn btn-outline" onclick="resetAll()">Reset</button>
     <button class="btn btn-outline" onclick="exportCSV()">Esporta CSV</button>
     <button class="btn btn-primary" onclick="window.print()">Stampa</button>
+    <button class="btn btn-success" id="btn-pubblica" style="display:none" onclick="pubblicaOnline()">Pubblica Online</button>
   </div>
 </header>
 
@@ -625,6 +627,8 @@ header .subtitle { font-size: .85rem; opacity: .8; margin-top: 2px; }
 </div>
 
 <script>
+const IS_ONLINE = window.location.hostname.includes('github.io');
+const PUBLISHED_DATA = null;
 const DAYS = ['Giorno 1', 'Giorno 2', 'Giorno 3'];
 
 const STANDS_VENDITE = [
@@ -673,6 +677,7 @@ function defaultState() {
 }
 
 function loadState() {
+  if (IS_ONLINE && PUBLISHED_DATA) return JSON.parse(JSON.stringify(PUBLISHED_DATA));
   try {
     const saved = localStorage.getItem('cassaTrapani2026');
     if (saved) return JSON.parse(saved);
@@ -1179,6 +1184,26 @@ function exportCSV() {
   URL.revokeObjectURL(url);
 }
 
+function pubblicaOnline() {
+  const dataJson = JSON.stringify(state);
+  const blob = new Blob([dataJson], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dati-gestionale.json';
+  a.click();
+  setTimeout(() => {
+    alert('File dati scaricato!\\nOra fai doppio clic su "Pubblica Online" sul Desktop.');
+  }, 500);
+}
+
+function lockInputs() {
+  document.querySelectorAll('input').forEach(el => {
+    el.setAttribute('disabled', 'true');
+    el.style.opacity = '0.8';
+  });
+  document.querySelectorAll('.btn-danger, .btn-success').forEach(el => el.style.display = 'none');
+}
+
 function initAll() {
   buildVendite();
   buildCorners();
@@ -1186,6 +1211,15 @@ function initAll() {
   buildAgio();
   buildSpese();
   buildResoconto();
+  if (IS_ONLINE) {
+    lockInputs();
+    document.getElementById('online-badge').style.display = 'inline-block';
+    document.querySelectorAll('.header-actions .btn').forEach(b => {
+      if (b.textContent.trim() === 'Reset' || b.textContent.trim() === 'Pubblica Online') b.style.display = 'none';
+    });
+  } else {
+    document.getElementById('btn-pubblica').style.display = 'inline-flex';
+  }
 }
 
 initAll();
