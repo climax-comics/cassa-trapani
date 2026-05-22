@@ -593,6 +593,12 @@ header .subtitle { font-size: .85rem; opacity: .8; margin-top: 2px; }
             </tr>
           </thead>
           <tbody></tbody>
+          <tfoot>
+            <tr style="background:#e8f5e9;font-weight:700;font-size:1.1em;">
+              <td colspan="3" style="text-align:right;padding-right:15px;">Totale Ricavi Agio:</td>
+              <td id="agio-totale-ricavi" style="color:var(--success);">€ 0,00</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>
@@ -628,7 +634,7 @@ header .subtitle { font-size: .85rem; opacity: .8; margin-top: 2px; }
 
 <script>
 const IS_ONLINE = window.location.hostname.includes('github.io');
-const PUBLISHED_DATA = {"vendite":{"fumetti":{"0":{"contanti":23,"bancomat":0},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"libri":{"0":{"contanti":0,"bancomat":0},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"kids":{"0":{"contanti":12.9,"bancomat":12},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"tunue":{"0":{"contanti":96.5,"bancomat":71.4},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"gigaciao":{"0":{"contanti":137.6,"bancomat":285},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"poster":{"0":{"contanti":0,"bancomat":0},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}}},"corners":{"glifo":{"0":12,"1":0,"2":0},"revue":{"0":0,"1":0,"2":0},"ippocampo":{"0":0,"1":0,"2":0}},"climax":{"0":{"venduto":0,"costo":0},"1":{"venduto":0,"costo":0},"2":{"venduto":0,"costo":0},"costoPerc":70},"agio":{"fumetti":32,"libri":32,"kids":32,"tunue":40,"gigaciao":40,"glifo":40,"revue":30,"ippocampo":32},"spese":{"sacchetti":10,"rotolo":50,"personale":400,"extra_1779187878383":6},"speseExtra":[{"id":"extra_1779187878383","name":"Scotch"}]};
+const PUBLISHED_DATA = {"vendite":{"fumetti":{"0":{"contanti":272.8,"bancomat":280.5},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"libri":{"0":{"contanti":99.8,"bancomat":105.7},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"kids":{"0":{"contanti":12.9,"bancomat":12},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"tunue":{"0":{"contanti":96.5,"bancomat":71.4},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"gigaciao":{"0":{"contanti":137.6,"bancomat":285},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}},"poster":{"0":{"contanti":28.5,"bancomat":0},"1":{"contanti":0,"bancomat":0},"2":{"contanti":0,"bancomat":0}}},"corners":{"glifo":{"0":12,"1":0,"2":0},"revue":{"0":0,"1":0,"2":0},"ippocampo":{"0":96.8,"1":0,"2":0}},"climax":{"0":{"venduto":36,"costo":0},"1":{"venduto":0,"costo":0},"2":{"venduto":0,"costo":0},"costoPerc":70},"agio":{"fumetti":32,"libri":32,"kids":32,"tunue":40,"gigaciao":40,"glifo":40,"revue":30,"ippocampo":32},"spese":{"sacchetti":10,"rotolo":50,"personale":400,"extra_1779187878383":10},"speseExtra":[{"id":"extra_1779187878383","name":"Scotch"}]};
 const DAYS = ['Giorno 1', 'Giorno 2', 'Giorno 3'];
 
 const STANDS_VENDITE = [
@@ -637,7 +643,7 @@ const STANDS_VENDITE = [
   { id: 'kids', name: 'Bookshop Kids', theme: 'kids', type: 'cashcard' },
   { id: 'tunue', name: "Tunue'", theme: 'tunue', type: 'cashcard' },
   { id: 'gigaciao', name: 'GigaCiao', theme: 'gigaciao', type: 'cashcard' },
-  { id: 'poster', name: 'Poster', theme: 'ippocampo', type: 'cashcard' },
+  { id: 'poster', name: 'Poster + Gadget', theme: 'ippocampo', type: 'cashcard' },
 ];
 
 const CORNERS = [
@@ -954,18 +960,23 @@ function buildAgio() {
       <td class="val" id="agio-ricavo-${stand.id}">${fmt(agioVal)}</td>`;
     tbody.appendChild(tr);
   });
+  refreshAgioTotals();
 }
 
 function refreshAgioTotals() {
+  let totRicavi = 0;
   getAllStands().forEach(stand => {
     const totVendite = getStandTotVendite(stand.id);
     const agioPerc = state.agio[stand.id] || 0;
     const agioVal = totVendite * agioPerc / 100;
+    totRicavi += agioVal;
     const vendEl = document.getElementById('agio-vendite-' + stand.id);
     if (vendEl) vendEl.textContent = fmt(totVendite);
     const ricEl = document.getElementById('agio-ricavo-' + stand.id);
     if (ricEl) ricEl.textContent = fmt(agioVal);
   });
+  const totEl = document.getElementById('agio-totale-ricavi');
+  if (totEl) totEl.textContent = fmt(totRicavi);
 }
 
 function updateAgio(el) {
