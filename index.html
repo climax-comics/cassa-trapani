@@ -1137,6 +1137,14 @@ function buildResoconto() {
     <div class="resoconto-box netto">
       <div class="resoconto-label">Contanti - Spese - C.P. Climax</div>
       <div class="resoconto-value ${netto >= 0 ? 'positive' : 'negative'}">${fmt(netto)}</div>
+    </div>
+    <div class="resoconto-box totale">
+      <div class="resoconto-label">Totale Azzeramento</div>
+      <div class="resoconto-value">${fmt(5627.83)}</div>
+    </div>
+    <div class="resoconto-box netto">
+      <div class="resoconto-label">Calcolo Bonifico (Azzeramento - POS - Contanti+Spese)</div>
+      <div class="resoconto-value ${(5627.83 - grandBancomat - netto) >= 0 ? 'positive' : 'negative'}">${fmt(5627.83 - grandBancomat - netto)}</div>
     </div>`;
 }
 
