@@ -741,6 +741,16 @@ function buildVendite() {
         </div>`;
       if (i < DAYS.length - 1) html += '<div class="section-divider"></div>';
     });
+    let totC = 0, totB = 0;
+    DAYS.forEach((_, i) => {
+      totC += (state.vendite[stand.id]?.[i]?.contanti || 0);
+      totB += (state.vendite[stand.id]?.[i]?.bancomat || 0);
+    });
+    html += `<div class="section-divider"></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;font-size:.9rem;">
+        <div style="color:#2e7d32;">Tot. Contanti: <span id="totcash-${stand.id}">${fmt(totC)}</span></div>
+        <div style="color:#1565c0;">Tot. POS: <span id="totpos-${stand.id}">${fmt(totB)}</span></div>
+      </div>`;
     html += '</div>';
     card.innerHTML = html;
     grid.appendChild(card);
@@ -749,16 +759,22 @@ function buildVendite() {
 
 function refreshVenditeTotals() {
   STANDS_VENDITE.forEach(stand => {
-    let tot = 0;
+    let tot = 0, totC = 0, totB = 0;
     DAYS.forEach((_, i) => {
       const c = state.vendite[stand.id]?.[i]?.contanti || 0;
       const b = state.vendite[stand.id]?.[i]?.bancomat || 0;
       tot += c + b;
+      totC += c;
+      totB += b;
       const dtEl = document.getElementById('daytot-' + stand.id + '-' + i);
       if (dtEl) dtEl.textContent = fmt(c + b);
     });
     const totEl = document.getElementById('tot-' + stand.id);
     if (totEl) totEl.textContent = fmt(tot);
+    const cashEl = document.getElementById('totcash-' + stand.id);
+    if (cashEl) cashEl.textContent = fmt(totC);
+    const posEl = document.getElementById('totpos-' + stand.id);
+    if (posEl) posEl.textContent = fmt(totB);
   });
 }
 
